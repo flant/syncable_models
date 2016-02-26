@@ -1,6 +1,7 @@
 # SyncableModels
 
 This gem helps you to:
+
 1. Fetch object attributes from the outside of your app
 2. Mark objects as synced by a special tag
 3. Drop this marks automatically when the object updates
