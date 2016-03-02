@@ -20,7 +20,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install path_mapper
+    $ gem install syncable_models
 
 Then generate and run migration for Sync model:
 
@@ -29,7 +29,7 @@ Then generate and run migration for Sync model:
 
 ## Usage
 
-At first you shoudl mark you model as syncable:
+At first you should mark you model as syncable:
 
 ```ruby
 class Project < ApplicationRecord
