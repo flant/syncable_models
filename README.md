@@ -38,7 +38,7 @@ class Project < ApplicationRecord
 end
 ```
 
-Then create a controller with API methods. 
+Then create a controller with API methods.
 
 ```ruby
 class ImportApiController < ApplicationController
@@ -47,12 +47,12 @@ class ImportApiController < ApplicationController
 end
 ```
 
-This code will automatically generate two api methods for this controller: 
+This code will automatically generate two api methods for this controller:
 
-1. projects - get a list of non-synced Project objects
+1. `projects` - get a list of non-synced Project objects
   * receives: destination argument - the tag for syncing and an optional count parameter (default value is 50).
-  * returns: response with an array of the objects, non-synced by this tag 
-2. sync_projects - sync Project objects by a tag
+  * returns: response with an array of the objects, non-synced by this tag
+2. `sync_projects` - sync Project objects by a tag
   * receives: ids - an array of objects' ids for syncing; destination - tag for syncing
   * returns: {status: 200} if everything is Ok.
 

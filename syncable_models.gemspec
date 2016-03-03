@@ -14,10 +14,13 @@ Gem::Specification.new do |s|
   s.description = "The gem provides tagged syncing functionality and API methods."
   s.license     = "MIT"
 
-  s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
+  s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir["test/**/*"]
 
-  s.add_dependency "rails", "> 4.2.5"
+  s.add_dependency "activerecord", ">= 4.2.5"
+  s.add_dependency "activesupport", ">= 4.2.5"
 
   s.add_development_dependency "mysql2"
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'travis', '~> 1.8', '>= 1.8.2'
 end
