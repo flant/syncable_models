@@ -150,7 +150,7 @@ DEPENDENCIES
   rake
   sqlite3
   syncable_models!
-  travis (~> 1.8, >= 1.8.2)
+  travis (>= 1.8.2)
 
 BUNDLED WITH
    1.11.2
