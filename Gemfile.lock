@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    syncable_models (0.0.4)
+    syncable_models (0.0.5)
       activerecord (~> 4.2.5)
       activesupport (~> 4.2.5)
       faraday (~> 0.9.2)
