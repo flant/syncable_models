@@ -19,8 +19,8 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 2.1.0'
 
-  s.add_dependency "activerecord", ">= 4.2.5"
-  s.add_dependency "activesupport", ">= 4.2.5"
-  s.add_dependency "railties", ">= 4.2.5"
-  s.add_dependency "faraday"
+  s.add_dependency "activerecord", "~> 4.2.5"
+  s.add_dependency "activesupport", "~> 4.2.5"
+  s.add_dependency "railties", "~> 4.2.5"
+  s.add_dependency "faraday", "~> 0.9.2"
 end
