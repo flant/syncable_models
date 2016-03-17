@@ -5,3 +5,6 @@ require "syncable_models_importer"
 
 module SyncableModels
 end
+
+module SyncableModelsImporter
+end
