@@ -1,6 +1,6 @@
 require 'faraday'
 
-module SyncableModels::Importer
+module SyncableModelsImporter
   class Import
     attr_accessor :api_url, :destination
     attr_reader :models
