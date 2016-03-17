@@ -22,4 +22,5 @@ Gem::Specification.new do |s|
   s.add_dependency "activerecord", ">= 4.2.5"
   s.add_dependency "activesupport", ">= 4.2.5"
   s.add_dependency "railties", ">= 4.2.5"
+  s.add_dependency "faraday"
 end

@@ -4,6 +4,7 @@ PATH
     syncable_models (0.0.1)
       activerecord (>= 4.2.5)
       activesupport (>= 4.2.5)
+      faraday
       railties (>= 4.2.5)
 
 GEM

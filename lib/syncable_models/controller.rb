@@ -27,7 +27,7 @@ module SyncableModels::Controller
     if params[:destination]
       count = params[:count].present? ? params[:count].to_i : BATCH_COUNT
       result = klass.not_synced(params[:destination]).limit(count).map(&:to_import_hash)
-      render json: { status: 200, clients: result }
+      render json: { status: 200, objects: result }
     else
       render_argument_error
     end
