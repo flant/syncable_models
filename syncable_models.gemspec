@@ -20,11 +20,6 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 2.1.0'
 
   # TODO: add double-ended versions
-  s.add_dependency "rails", ">= 4.2.5"
-  s.add_dependency "sqlite3"
-  s.add_dependency "mysql2"
-  s.add_dependency "rake"
-  s.add_dependency 'travis', '>= 1.8.2'
   s.add_dependency "activerecord", ">= 4.2.5"
   s.add_dependency "activesupport", ">= 4.2.5"
   s.add_dependency "railties", ">= 4.2.5"
