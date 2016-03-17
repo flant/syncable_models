@@ -12,9 +12,3 @@ gemspec
 
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
-
-# gem "rails", ">= 4.2.5"
-# gem "sqlite3"
-# gem "mysql2"
-# gem 'rake'
-# gem 'travis', '>= 1.8.2'
