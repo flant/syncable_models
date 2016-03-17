@@ -1,4 +1,4 @@
-# SyncableModels
+# SyncableModels [![Build Status](https://travis-ci.org/flant/syncable_models.svg?branch=master)](https://travis-ci.org/flant/syncable_model)
 
 This gem helps you to:
 
