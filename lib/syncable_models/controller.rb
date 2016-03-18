@@ -4,23 +4,28 @@ module SyncableModels::Controller
   BATCH_COUNT = 50
 
   module ClassMethods
-  def sync_for(subject, class_name: nil, sync_method: nil, fetch_method: nil)
-    klass = class_name || subject.to_s.singularize.camelize
-    klass = klass.constantize unless klass.is_a?(Class)
+    def sync_for(subject, class_name: nil, sync_method: nil, fetch_method: nil)
+      klass = class_name || subject.to_s.singularize.camelize
+      klass = klass.constantize unless klass.is_a?(Class)
 
-    sync_method = sync_method || "sync_#{subject}"
-    fetch_method = fetch_method || "#{subject}"
+      sync_method = sync_method || "sync_#{subject}"
+      fetch_method = fetch_method || "#{subject}"
 
-    class_eval """
-      def #{sync_method}
-        set_synced #{klass.name}
-      end
+      class_eval """
+        def #{sync_method}
+          set_synced #{klass.name}
+        end
 
-      def #{fetch_method}
-        fetch #{klass.name}
-      end
-    """
-  end
+        def #{fetch_method}
+          fetch #{klass.name}
+        end
+      """
+    end
+
+    def authorize_by_key(key=nil)
+      define_method(:api_key){ key }
+      before_action :do_authorize_by_key
+    end
   end
 
   def fetch(klass)
@@ -44,5 +49,11 @@ module SyncableModels::Controller
 
   def render_argument_error
     return render json: { status: 400, message: 'Not enough arguments' }
+  end
+
+  def do_authorize_by_key
+    if params[:key] != api_key
+      return render json: { status: 401, message: 'Unauthorized'}
+    end
   end
 end
