@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.summary     = "Sync your models easily."
   s.description = "The gem provides tagged syncing functionality and API methods."
   s.license     = "MIT"
+  s.executables << 'import'
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir["test/**/*"]

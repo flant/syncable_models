@@ -7,4 +7,7 @@ SyncableModels::Importer.config do |conf|
   #   import.import_model 'Project', id_key: :uuid
   #   import.import_model 'Team', fetch_path: 'some_teams', sync_path: 'sync_some_teams'
   # end
+
+  # conf.interval = 5.minutes
+  # conf.timeout = 10.seconds
 end
