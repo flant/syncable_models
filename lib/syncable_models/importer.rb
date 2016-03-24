@@ -1,4 +1,5 @@
 require 'faraday'
+load 'tasks/syncable_models.rake'
 
 module SyncableModels
   module Importer
@@ -61,9 +62,10 @@ module SyncableModels
               synced_ids = []
 
               response['objects'].each do |o|
+                id = o[params[:id_key].to_s]
                 result = klass.from_import_hash(o)
-                puts "[SyncableModels::Importer] Importing #{model_name} (id=#{o[params[:id_key].to_s]}): #{ result ? 'OK' : 'FAIL' }"
-                synced_ids << o[params[:id_key].to_s] if result
+                puts "[SyncableModels::Importer] Importing #{model_name} (id=#{id}): #{ result ? 'OK' : 'FAIL' }"
+                synced_ids << id if result
               end
 
               if synced_ids.any?
