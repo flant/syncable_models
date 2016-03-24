@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+require ENV['APP_PATH'] || File.join(File.expand_path('.'), 'config', 'application')
+Rails.application.initialize!
+
+## Importer
+puts 'Starting Importer... '
+
+importers = []
+
+SyncableModels::Importer.imports.each do |i|
+  puts "Registering importer #{ i.name } (interval=#{ i.interval }s, timeout=#{ i.timeout }s)..."
+  importers << Concurrent::TimerTask.new(execution_interval: i.interval,
+                                         timeout_interval: i.timeout,
+                                         run_now: true) do
+    begin
+      i.import
+    rescue => exc
+      Rails.logger.error "[Importer] Error: #{exc.message}\n" \
+                         "    backtrace:\n        #{exc.backtrace.join("\n        ")}"
+    end
+  end
+end
+
+importers.each &:execute
+puts "done."
+
+# Signal catching
+def shut_down
+  puts "\nShutting down gracefully..."
+  sleep 1
+end
+
+["TERM", "INT"].each do |sig|
+  trap(sig) do
+    shut_down
+    exit
+  end
+end
+
+
+loop { sleep }

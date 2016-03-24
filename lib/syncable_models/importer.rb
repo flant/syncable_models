@@ -3,11 +3,14 @@ require 'faraday'
 module SyncableModels
   module Importer
     class Import
-      attr_accessor :api_url, :api_key, :destination
+      attr_accessor :name, :api_url, :api_key, :destination, :interval, :timeout
       attr_reader :models
 
-      def initialize
+      def initialize(name)
+        @name = name.to_s
         @models = {}
+        @interval = 5.minutes
+        @timeout = 10.seconds
       end
 
       def import_model(class_name, args = {})
@@ -31,8 +34,15 @@ module SyncableModels
         params
       end
 
-      def import
-        @models.each do |model_name, params|
+      def import(model_names=[])
+        selected_models = model_names.any? ?
+          @models.select{ |k, v| k.in? model_names } :
+          @models
+
+        selected_models.each do |model_name, params|
+          puts "[SyncableModels::Importer] Importing #{model_name.underscore.pluralize}..."
+          next if model_names.any? && !model_name.in?(model_names)
+
           fetch_url = self.api_url + params[:fetch_path]
           sync_url = self.api_url + params[:sync_path]
 
@@ -66,22 +76,24 @@ module SyncableModels
       end
     end
 
-    mattr_accessor :imports, :interval, :timeout
+    mattr_accessor :imports
     @@imports = []
-    @@interval = 5.minutes
-    @@timeout = 10.seconds
 
     def self.config
       yield self
     end
 
-    def self.add_import
-      import = Import.new
+    def self.add_import(name)
+      import = Import.new name
       yield import
       @@imports << import
     end
 
-    def self.import
+    def self.find_import(name)
+      @@imports.detect{ |i| i.name == name.to_s }
+    end
+
+    def self.import_all
       @@imports.each &:import
     end
   end
