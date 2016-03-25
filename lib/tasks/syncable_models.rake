@@ -2,7 +2,7 @@
 
 def prepare_models(models)
   return unless models
-  models.split(',').map(&:camelize)
+  models.gsub(/\s*/, '').split(',').map(&:camelize)
 end
 
 namespace :syncable_models do
