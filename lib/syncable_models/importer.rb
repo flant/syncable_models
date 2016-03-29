@@ -36,45 +36,76 @@ module SyncableModels
       end
 
       def import(model_names=[])
+        model_names = [model_names] unless model_names.is_a?(Array)
+        model_names.map!(&:to_s)
         selected_models = model_names.any? ?
           @models.select{ |k, v| k.in? model_names } :
           @models
 
         selected_models.each do |model_name, params|
           puts "[SyncableModels::Importer] Importing #{model_name.underscore.pluralize}..."
+
           next if model_names.any? && !model_name.in?(model_names)
 
-          fetch_url = self.api_url + params[:fetch_path]
-          sync_url = self.api_url + params[:sync_path]
-
-          conn = Faraday.new(url: fetch_url)
-          response = conn.get '', params_with_api_key(destination: destination)
+          response = fetch_request(params)
 
           if response.success?
             response = JSON.parse(response.body)
-
             if response["status"].to_i == 401
               puts "[SyncableModels::Importer] Wrong api key!"
             end
 
-            if response['objects'] && response['objects'].count > 0
-              klass = model_name.constantize
-              synced_ids = []
+            synced_ids = []
 
-              response['objects'].each do |o|
-                id = o[params[:id_key].to_s]
-                result = klass.from_import_hash(o)
-                puts "[SyncableModels::Importer] Importing #{model_name} (id=#{id}): #{ result ? 'OK' : 'FAIL' }"
-                synced_ids << id if result
-              end
+            synced_ids += sync_update model_name, params, response['for_sync']
+            synced_ids += sync_destroy model_name, response['for_destroy']
 
-              if synced_ids.any?
-                conn = Faraday.new(url: sync_url)
-                response = conn.get '', params_with_api_key(destination: self.destination, ids: synced_ids)
-              end
-            end
+            sync_request(params, synced_ids) if synced_ids.any?
           end
         end
+      end
+
+      def fetch_request(params)
+        conn = Faraday.new(url: api_url + params[:fetch_path])
+        conn.get '', params_with_api_key(destination: destination)
+      end
+
+      def sync_request(params, ids)
+        conn = Faraday.new(url: api_url + params[:sync_path])
+        conn.get '', params_with_api_key(destination: destination, ids: ids)
+      end
+
+      def sync_update(model_name, params, objects)
+        synced_ids = []
+
+        if objects
+          klass = model_name.constantize
+
+          objects.each do |o|
+            id = o[params[:id_key].to_s]
+            result = klass.from_import_hash(o)
+            puts "[SyncableModels::Importer] Importing #{model_name} (external_id=#{id}): #{ result ? 'OK' : 'FAIL' }"
+            synced_ids << id if result
+          end
+        end
+
+        synced_ids
+      end
+
+      def sync_destroy(model_name, ids)
+        synced_ids = []
+
+        if ids
+          klass = model_name.constantize
+
+          ids.each do |id|
+            result = klass.where(external_id: id).first.try(:destroy)
+            puts "[SyncableModels::Importer] Destroying #{model_name} (external_id=#{id}): #{ result ? 'OK' : 'FAIL' }"
+            synced_ids << id if result
+          end
+        end
+
+        synced_ids
       end
     end
 
@@ -96,7 +127,7 @@ module SyncableModels
     end
 
     def self.import_all
-      @@imports.each &:import
+      @@imports.each(&:import)
     end
   end
 end

@@ -2,9 +2,14 @@ module SyncableModels::ActiveRecord
   extend ActiveSupport::Concern
 
   included do
-    has_many :syncs, as: :subject, inverse_of: :subject, class_name: ::SyncableModels::Sync
+    has_many :syncs,
+      as: :subject,
+      inverse_of: :subject,
+      class_name: ::SyncableModels::Sync,
+      dependent: :nullify
 
     after_update :clear_syncs_on_update
+    after_destroy :set_syncs_destroyed
 
     scope :synced, ->(d){ joins(:syncs).where(syncs: { destination: d }) }
     scope :not_synced, ->(d) do
@@ -19,23 +24,31 @@ module SyncableModels::ActiveRecord
   end
 
   def synced?(destination)
-    self.syncs.where(destination: destination).exists?
+    syncs.where(destination: destination).exists?
   end
 
   def sync(destination)
-    self.syncs.create(destination: destination) unless self.synced?(destination)
+    syncs.create(destination: destination) unless synced?(destination)
   end
 
   def clear_syncs(destination = nil)
-    syncs = destination ? self.syncs.by_destination(destination) : self.syncs
-    syncs.destroy_all
+    (destination ? syncs.by_destination(destination) : syncs).destroy_all
+  end
+
+  def syncable_models_external_id
+    self.send(self.class.syncable_models_id_key)
   end
 
   def clear_syncs_on_update
-    self.clear_syncs
+    clear_syncs
+  end
+
+  def set_syncs_destroyed
+    SyncableModels::Sync.where(subject_external_id: self.syncable_models_external_id)
+      .update_all(subject_destroyed: true)
   end
 
   def to_import_hash
-    self.attributes
+    attributes
   end
 end

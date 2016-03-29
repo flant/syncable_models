@@ -7,5 +7,27 @@ module SyncableModels
     validates :subject, :subject_type, :destination, presence: true
 
     scope :by_destination, ->(*d) { where(destination: d) }
+    scope :for_destroying, ->{ where(subject_destroyed: true) }
+
+    before_save do
+      self.subject_external_id = subject.syncable_models_external_id
+    end
+
+    def subject
+      super || begin
+        subject_klass = subject_type.constantize
+        subject_klass.where(subject_klass.syncable_models_id_key => subject_external_id).first
+      end
+    end
+
+    def sync_destruction!
+      if subject
+        self.subject = subject
+        self.subject_destroyed = false
+        save!
+      else
+        destroy
+      end
+    end
   end
 end

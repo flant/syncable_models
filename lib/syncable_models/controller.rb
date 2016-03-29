@@ -4,7 +4,7 @@ module SyncableModels::Controller
   BATCH_COUNT = 50
 
   module ClassMethods
-    def sync_for(subject, class_name: nil, sync_method: nil, fetch_method: nil)
+    def sync_for(subject, id_key: :uuid, class_name: nil, sync_method: nil, fetch_method: nil)
       klass = class_name || subject.to_s.singularize.camelize
       klass = klass.constantize unless klass.is_a?(Class)
 
@@ -13,7 +13,7 @@ module SyncableModels::Controller
 
       class_eval """
         def #{sync_method}
-          set_synced #{klass.name}
+          set_synced #{klass.name}, :#{id_key.to_s}
         end
 
         def #{fetch_method}
@@ -31,16 +31,35 @@ module SyncableModels::Controller
   def fetch(klass)
     if params[:destination]
       count = params[:count].present? ? params[:count].to_i : BATCH_COUNT
-      result = klass.not_synced(params[:destination]).limit(count).map(&:to_import_hash)
-      render json: { status: 200, objects: result }
+
+      for_sync = klass.not_synced(params[:destination]).limit(count).map(&:to_import_hash)
+      count = count - for_sync.count
+      for_destroy = SyncableModels::Sync
+        .by_destination(params[:destination])
+        .for_destroying
+        .limit(count)
+        .map(&:subject_external_id)
+
+      render json: { status: 200, for_sync: for_sync, for_destroy: for_destroy }
     else
       render_argument_error
     end
   end
 
-  def set_synced(klass, id_key = :uuid)
+  def set_synced(klass, id_key)
     if params[:ids] && params[:destination]
-      klass.where(id_key => params[:ids]).sync(params[:destination])
+      ids = params[:ids]
+
+      destruction_syncs = SyncableModels::Sync
+        .by_destination(params[:destination])
+        .for_destroying
+        .where(subject_external_id: ids)
+
+      destruction_sync_ids = destruction_syncs.pluck(:subject_external_id).map(&:to_s)
+      destruction_syncs.each{ |s| s.sync_destruction! }
+      ids -= destruction_sync_ids
+
+      klass.where(id_key => ids).sync(params[:destination])
       render json: { status: 200 }
     else
       render_argument_error

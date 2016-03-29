@@ -1,3 +1,4 @@
+# This migration comes from syncable_models (originally 20160225141153)
 class CreateSyncs < ActiveRecord::Migration
   def change
     create_table :syncs do |t|

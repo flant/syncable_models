@@ -1,4 +1,4 @@
-# desc "Explaining what the task does"
+require 'rake'
 
 def prepare_models(models)
   return unless models

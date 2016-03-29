@@ -17,4 +17,11 @@ gem "rails", ">= 4.2.5"
 gem "sqlite3"
 gem "mysql2"
 gem 'rake'
-gem 'travis', '>= 1.8.2'
+gem 'permanent_records'
+
+group :development do
+  gem 'travis', '>= 1.8.2'
+end
+
+gem 'factory_girl_rails'
+gem 'rspec-rails'
