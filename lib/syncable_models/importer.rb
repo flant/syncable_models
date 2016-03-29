@@ -18,11 +18,13 @@ module SyncableModels
         class_name = class_name.to_s if class_name.is_a?(Class)
         fetch_path = args[:fetch_path] || class_name.underscore.pluralize
         sync_path = args[:sync_path] || "sync_" + class_name.underscore.pluralize
-        id_key = args[:id_key] || :uuid
+        api_id_key = args[:api_id_key] || :uuid
+        external_id_column = args[:external_id_column] || :external_id
         @models[class_name] = {
           fetch_path: fetch_path,
           sync_path: sync_path,
-          id_key: id_key
+          api_id_key: api_id_key,
+          external_id_column: external_id_column
         }
       end
 
@@ -58,7 +60,7 @@ module SyncableModels
             synced_ids = []
 
             synced_ids += sync_update model_name, params, response['for_sync']
-            synced_ids += sync_destroy model_name, response['for_destroy']
+            synced_ids += sync_destroy model_name, params, response['for_destroy']
 
             sync_request(params, synced_ids) if synced_ids.any?
           end
@@ -92,14 +94,14 @@ module SyncableModels
         synced_ids
       end
 
-      def sync_destroy(model_name, ids)
+      def sync_destroy(model_name, params, ids)
         synced_ids = []
 
         if ids
           klass = model_name.constantize
 
           ids.each do |id|
-            result = klass.where(external_id: id).first.try(:destroy)
+            result = klass.where(params[:external_id_column].to_s => id).first.try(:destroy)
             puts "[SyncableModels::Importer] Destroying #{model_name} (external_id=#{id}): #{ result ? 'OK' : 'FAIL' }"
             synced_ids << id if result
           end
