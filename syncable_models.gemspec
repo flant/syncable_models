@@ -7,7 +7,7 @@ require "syncable_models/version"
 Gem::Specification.new do |s|
   s.name        = "syncable_models"
   s.version     = SyncableModels::VERSION
-  s.authors     = ["Serafim Nenarokov"]
+  s.authors     = ["Serafim Nenarokov", "Sergey Gnuskov"]
   s.email       = ["serafim.nenarokov@flant.ru"]
   s.homepage    = "https://github.com/flant/syncable_models"
   s.summary     = "Sync your models easily."
