@@ -84,7 +84,7 @@ module SyncableModels
           klass = model_name.constantize
 
           objects.each do |o|
-            id = o[params[:id_key].to_s]
+            id = o[params[:api_id_key].to_s]
             result = klass.from_import_hash(o)
             puts "[SyncableModels::Importer] Importing #{model_name} (external_id=#{id}): #{ result ? 'OK' : 'FAIL' }"
             synced_ids << id if result
