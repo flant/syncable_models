@@ -19,15 +19,5 @@ module SyncableModels
         subject_klass.where(subject_klass.syncable_models_id_key => subject_external_id).first
       end
     end
-
-    def sync_destruction!
-      if subject
-        self.subject = subject
-        self.subject_destroyed = false
-        save!
-      else
-        destroy
-      end
-    end
   end
 end

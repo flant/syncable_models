@@ -32,8 +32,9 @@ module SyncableModels::Controller
     if params[:destination]
       count = params[:count].present? ? params[:count].to_i : BATCH_COUNT
 
-      for_sync = klass.not_synced(params[:destination]).limit(count).map(&:to_import_hash)
+      for_sync = klass.syncable_models_suitable.not_synced(params[:destination]).limit(count).map(&:to_import_hash)
       count = count - for_sync.count
+
       for_destroy = SyncableModels::Sync
         .by_destination(params[:destination])
         .for_destroying
@@ -56,7 +57,7 @@ module SyncableModels::Controller
         .where(subject_external_id: ids)
 
       destruction_sync_ids = destruction_syncs.pluck(:subject_external_id).map(&:to_s)
-      destruction_syncs.each{ |s| s.sync_destruction! }
+      destruction_syncs.each(&:destroy)
       ids -= destruction_sync_ids
 
       klass.where(id_key => ids).sync(params[:destination])

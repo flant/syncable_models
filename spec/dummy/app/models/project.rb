@@ -1,5 +1,5 @@
 class Project < ActiveRecord::Base
-  syncable
+  syncable scope: :not_deleted
 
   validates :name, :uuid, presence: true
 

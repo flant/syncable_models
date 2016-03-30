@@ -88,12 +88,19 @@ RSpec.describe ImportApiController, type: :controller do
           @projects.each(&:reload)
         end
 
-        it 'doesn\'t destroy their syncs' do
-          expect(SyncableModels::Sync.count).to eq(3)
+        it 'destroys their syncs' do
+          expect(SyncableModels::Sync.count).to eq(1)
         end
 
-        it 'makes syncs of destroyed object with correct subject_destroyed attribute' do
-          expect(@projects.first(2).map(&:syncs).flatten.compact.map(&:subject_destroyed)).to eq([false, false])
+        it 'doesn\'t put destroyed objects to the list sync' do
+          get :projects, destination: :test
+          expect(for_sync.count).to eq(0)
+        end
+
+        it 'put destroyed objects to the sync list after revive' do
+          @projects.first(2).each(&:revive)
+          get :projects, destination: :test
+          expect(for_sync.count).to eq(2)
         end
       end
     end

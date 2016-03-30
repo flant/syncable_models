@@ -85,22 +85,4 @@ RSpec.describe SyncableModels::Sync, type: :model do
       expect(@sync.subject_external_id).to eq(@id.to_s)
     end
   end
-
-  describe '#sync_destruction!' do
-    it 'updates sync when subject persisted' do
-      project = create(:first_project)
-      project.sync(:test)
-      project.destroy
-      SyncableModels::Sync.first.sync_destruction!
-      expect(SyncableModels::Sync.first.try(&:subject_destroyed)).to be false
-    end
-
-    it 'destroys sync when subject not persisted' do
-      team = create(:first_team)
-      team.sync(:test)
-      team.destroy
-      SyncableModels::Sync.first.sync_destruction!
-      expect(SyncableModels::Sync.first).to be_nil
-    end
-  end
 end
