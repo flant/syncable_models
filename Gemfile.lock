@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    syncable_models (0.0.15)
+    syncable_models (0.0.16)
       activerecord (>= 4.2.5)
       activesupport (>= 4.2.5)
       concurrent-ruby-edge (>= 0.2.1)

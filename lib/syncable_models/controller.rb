@@ -32,7 +32,10 @@ module SyncableModels::Controller
     if params[:destination]
       count = params[:count].present? ? params[:count].to_i : BATCH_COUNT
 
-      for_sync = klass.syncable_models_suitable.not_synced(params[:destination]).limit(count).map(&:to_import_hash)
+      for_sync = klass.syncable_models_suitable(params[:destination])
+                      .not_synced(params[:destination])
+                      .limit(count)
+                      .map(&:to_import_hash)
       count = count - for_sync.count
 
       for_destroy = SyncableModels::Sync

@@ -1,5 +1,5 @@
 class Project < ActiveRecord::Base
-  syncable scope: :not_deleted
+  syncable scope: :not_deleted, conditions: { condition_test: ->(){ where.not(name: 'TestProject') } }
 
   validates :name, :uuid, presence: true
 
