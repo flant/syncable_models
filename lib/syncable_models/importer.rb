@@ -20,6 +20,7 @@ module SyncableModels
         sync_path = args[:sync_path] || "sync_" + class_name.underscore.pluralize
         api_id_key = args[:api_id_key] || :uuid
         external_id_column = args[:external_id_column] || :external_id
+
         @models[class_name] = {
           fetch_path: fetch_path,
           sync_path: sync_path,
@@ -86,12 +87,20 @@ module SyncableModels
           objects.each do |o|
             id = o[params[:api_id_key].to_s]
             result = klass.from_import_hash(o)
-            puts "[SyncableModels::Importer] Importing #{model_name} (external_id=#{id}): #{ result ? 'OK' : 'FAIL' }"
+            puts "[SyncableModels::Importer] Importing #{model_name} (external_id=#{id}): #{ sync_result_as_string(result) }"
             synced_ids << id if result
           end
         end
 
         synced_ids
+      end
+
+      def sync_result_as_string(result)
+        if result.respond_to?(:valid?) && result.respond_to?(:errors)
+          result.valid? ? 'OK' : "FAIL: #{result.errors.try(:full_messages).try { |r| r.join(', ') }}"
+        else
+          result ? 'OK' : 'FAIL'
+        end
       end
 
       def sync_destroy(model_name, params, ids)

@@ -42,7 +42,7 @@ RSpec.describe SyncableModels::Importer::Import, type: :model do
         for_sync: [{ uuid: @imported_uuid, name: @imported_name }],
         for_destroy: ['8e9d12b3-5df0-46c3-ae19-6ac7d10879a4']
       })
-      @import.import_model Project, id_key: :uuid
+      @import.import_model Project
       @import.import [Project]
     end
 
@@ -76,13 +76,12 @@ RSpec.describe SyncableModels::Importer::Import, type: :model do
         for_sync: [{ id: @imported_id, name: @imported_name }],
         for_destroy: ['73']
       })
-      @import.import_model Team, id_key: :id
+      @import.import_model Team, api_id_key: :id
       @import.import [Team]
     end
 
     describe 'subject for sync' do
       it 'imports correctly' do
-        puts Team.all.count.inspect
         expect(Team.where(external_id: @imported_id).first).not_to be_nil
       end
 

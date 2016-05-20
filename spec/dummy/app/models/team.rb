@@ -8,5 +8,6 @@ class Team < ActiveRecord::Base
     object.name = hash['name']
     object.external_id = hash['id']
     object.save
+    object
   end
 end

@@ -8,5 +8,6 @@ class Project < ActiveRecord::Base
     object.name = hash['name']
     object.external_id = hash['uuid']
     object.save
+    object
   end
 end
